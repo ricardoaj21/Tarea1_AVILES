@@ -1,0 +1,121 @@
+---
+title: "Taller"
+author: "Ricardo Aviles Jaimes"
+date: "29/8/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*PUNTO 1*
+
+```{r}
+library(readxl)
+library(tidyverse)
+library(dplyr)
+```
+
+
+**A**
+
+```{r}
+personas <- read_xlsx("Área - Características generales (Personas).xlsx")
+view(personas)
+trabajo <- read_xlsx("Área- Fuerza de trabajo.xlsx")
+attach(personas)
+attach(trabajo)
+
+datos <- left_join(personas, trabajo, by = c("DIRECTORIO", "SECUENCIA_P", "ORDEN"))
+attach(datos)
+```
+
+
+**B**
+
+```{r}
+dim(datos)
+view(datos)
+```
+
+**C**
+
+```{r}
+RV <- datos %>%  mutate(P6240a = ifelse(P6240 == 1, 1, 0))
+dim(RV)
+view(RV)
+```
+
+**D**
+
+```{r}
+TH <- RV %>% group_by(DIRECTORIO, SECUENCIA_P)%>% summarise(n= sum(P6240a))
+cu <- factor(TH$n)
+```
+
+
+**E**
+
+```{r}
+OC <- RV  %>% select( DIRECTORIO, SECUENCIA_P, P6240a) %>% group_by(DIRECTORIO) %>% summarise(P6240b = sum(P6240a))
+```
+
+
+**F**
+
+```{r}
+tabla <- table(TH$n)
+sum(is.na(TH$n))
+```
+
+
+**G**
+
+```{r}
+T1 <- datos %>% mutate(P6240a = ifelse(P6240 == 1, 1,0))
+
+```
+
+**H**
+
+```{r}
+TP <- RV %>% select(DIRECTORIO, SECUENCIA_P, P6240a, fex_c_2011.x) %>% group_by(DIRECTORIO, fex_c_2011.x) %>%  summarise(n= sum(P6240a))
+
+```
+
+**I**
+
+```{r}
+FACTOR_TP <- factor(TP$n)
+```
+
+**k**
+
+```{r}
+(tabla)/margin.table(tabla)
+```
+
+
+*Punto 2*
+
+```{r}
+EQUI <- read_xlsx("Equivalencias ciiu.xlsx")
+attach(EQUI)
+view(EQUI)
+```
+
+**A**
+
+```{r}
+tamano <- left_join(OC, personas)
+attach(tamano)
+```
+
+**B**
+
+```{r}
+A <- read_xlsx("Área - Ocupados.xlsx")
+B <- merge(x = EQUI, tamano)
+```
+
